@@ -20,7 +20,7 @@
     - dialout
     - gpio
     - i2c
-  when: ansible_distribution == 'Raspbian'
+  when: ansible_facts['distribution'] == 'Raspbian'
 
 - name: Create additional dialout,gpio,i2c users for the rasperry Pi
   ansible.builtin.user:
@@ -33,4 +33,4 @@
     - dialout
     - gpio
     - i2c
-  when: ansible_distribution == 'Raspbian'
+  when: ansible_facts['distribution'] == 'Raspbian'

@@ -3,13 +3,13 @@
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: true
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
 
 - name: Install specific OS packages
   ansible.builtin.package:
     name: libtiff6
     state: present
-  when: ansible_distribution == "Debian"
+  when: ansible_facts['distribution'] == "Debian"
 
 - name: Install specific packages
   ansible.builtin.package:
@@ -35,6 +35,19 @@
     - liblapack3
     - liblapack-dev
     - libatlas-base-dev
+  when: ansible_facts['distribution'] == "Debian"
+
+- name: Install specific packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python3
+    - python3-pip
+    - python3-devel
+    - openssl
+    - gcc
+  when: ansible_facts['os_family'] == "RedHat"
 
 - name: Install Debian-required additional pip packages
   ansible.builtin.pip:
@@ -46,4 +59,4 @@
     - packaging
     - wheel
     - aiohttp_cors
-  when: ansible_os_family == "Debian"
+  when: ansible_facts['os_family'] == "Debian"
