@@ -47,3 +47,12 @@
       - homeassistant
       - cron
   when: ha_backup_cron | bool
+
+# This MUST come after the homeassistant install task, as HA pulls in aiodns==3.2.0
+- name: Override aiodns to version compatible with pycares 5.x
+  pip:
+    name:
+      - "aiodns==4.0.4"
+    executable: /srv/homeassistant/bin/pip
+  become: true
+  notify: Restart Home Assistant
