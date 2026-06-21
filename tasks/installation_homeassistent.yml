@@ -27,3 +27,37 @@
     extra_args: "--upgrade"
   when: ha_version is undefined
 
+
+- name: Download ha_carrier integration at compatible version
+  ansible.builtin.get_url:
+    url: "https://github.com/dahlb/ha_carrier/archive/refs/tags/{{ ha_carrier_version }}.zip"
+    dest: /tmp/ha_carrier.zip
+
+- name: Unpack ha_carrier
+  ansible.builtin.unarchive:
+    src: /tmp/ha_carrier.zip
+    dest: /tmp/
+    remote_src: true
+
+- name: Deploy ha_carrier custom component
+  ansible.builtin.copy:
+    src: "/tmp/ha_carrier-{{ ha_carrier_version | replace('v', '') }}/custom_components/ha_carrier/"
+    dest: /home/homeassistant/.homeassistant/custom_components/ha_carrier/
+    owner: homeassistant
+    group: homeassistant
+    remote_src: true
+  notify: Restart Home Assistant
+
+- name: Install carrier-api into HA virtualenv
+  pip:
+    name: "carrier-api=={{ carrier_api_version }}"
+    executable: /srv/homeassistant/bin/pip
+  become: true
+  notify: Restart Home Assistant
+
+- name: Patch ha_carrier sensor.py for HA 2025.1.4 UnitOfPressure compatibility
+  replace:
+    path: /home/homeassistant/.homeassistant/custom_components/ha_carrier/sensor.py
+    regexp: 'UnitOfPressure\.INH2O'
+    replace: 'UnitOfPressure.INHG'
+  notify: Restart Home Assistant

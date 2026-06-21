@@ -1,2 +1,5 @@
 ---
 # vars file for homeassistant
+#
+  ha_carrier_version: "v2.18.2"
+  carrier_api_version: "2.11.1"  
