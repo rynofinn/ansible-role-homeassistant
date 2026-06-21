@@ -27,6 +27,11 @@
     extra_args: "--upgrade"
   when: ha_version is undefined
 
+- name: Allow carrier integration to make outbound network connections
+  seboolean:
+    name: nis_enabled
+    persistent: true
+    state: true
 
 - name: Download ha_carrier integration at compatible version
   ansible.builtin.get_url:
