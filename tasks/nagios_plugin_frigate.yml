@@ -1,0 +1,16 @@
+---
+- name: Install nagios plugin
+  ansible.builtin.template:
+    src: check_frigate_unit.j2
+    dest: "/usr/lib64/nagios/plugins/check_frigate_unit.sh"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install nagios plugin config
+  ansible.builtin.template:
+    src: check_frigate_conf.j2
+    dest: "/etc/nrpe.d/check_frigate_conf.cfg"
+    owner: root
+    group: root
+    mode: "0644"

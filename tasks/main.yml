@@ -56,3 +56,10 @@
     executable: /srv/homeassistant/bin/pip
   become: true
   notify: Restart Home Assistant
+
+- name: Deploy nagios plugin to monitor frigate service
+  ansible.builtin.import_tasks: nagios_plugin_frigate.yml
+  tags:
+      - homeassistant
+      - nagios
+

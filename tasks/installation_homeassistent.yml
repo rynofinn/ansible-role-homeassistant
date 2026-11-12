@@ -32,17 +32,20 @@
     name: nis_enabled
     persistent: true
     state: true
+  tags: carrier
 
 - name: Download ha_carrier integration at compatible version
   ansible.builtin.get_url:
     url: "https://github.com/dahlb/ha_carrier/archive/refs/tags/{{ ha_carrier_version }}.zip"
     dest: /tmp/ha_carrier.zip
+  tags: carrier
 
 - name: Unpack ha_carrier
   ansible.builtin.unarchive:
     src: /tmp/ha_carrier.zip
     dest: /tmp/
     remote_src: true
+  tags: carrier
 
 - name: Deploy ha_carrier custom component
   ansible.builtin.copy:
@@ -51,6 +54,7 @@
     owner: homeassistant
     group: homeassistant
     remote_src: true
+  tags: carrier
   notify: Restart Home Assistant
 
 - name: Install carrier-api into HA virtualenv
@@ -58,6 +62,7 @@
     name: "carrier-api=={{ carrier_api_version }}"
     executable: /srv/homeassistant/bin/pip
   become: true
+  tags: carrier
   notify: Restart Home Assistant
 
 - name: Patch ha_carrier sensor.py for HA 2025.1.4 UnitOfPressure compatibility
@@ -65,4 +70,5 @@
     path: /home/homeassistant/.homeassistant/custom_components/ha_carrier/sensor.py
     regexp: 'UnitOfPressure\.INH2O'
     replace: 'UnitOfPressure.INHG'
+  tags: carrier
   notify: Restart Home Assistant

@@ -1,0 +1,27 @@
+#!/bin/bash
+UNIT="$1"
+[ -z "$UNIT" ] && { echo "UNKNOWN - no unit specified"; exit 3; }
+
+STATE=$(systemctl is-active "$UNIT" 2>/dev/null)
+SUB=$(systemctl show -p SubState --value "$UNIT" 2>/dev/null)
+
+# any failed units on the box, for dependency context
+FAILED=$(systemctl list-units --state=failed --no-legend --plain 2>/dev/null \
+         | awk '{print $1}' | paste -sd, -)
+
+case "$STATE" in
+    active)
+        echo "OK - $UNIT is active ($SUB)"; exit 0 ;;
+    activating|reloading)
+        echo "WARNING - $UNIT is $STATE ($SUB)"; exit 1 ;;
+    inactive)
+        if [ -n "$FAILED" ]; then
+            echo "CRITICAL - $UNIT is inactive ($SUB); failed units: $FAILED"
+        else
+            echo "CRITICAL - $UNIT is inactive ($SUB) - stopped, no failed deps"
+        fi
+        exit 2 ;;
+    *)
+        echo "CRITICAL - $UNIT is ${STATE:-unknown} ($SUB); failed units: ${FAILED:-none}"
+        exit 2 ;;
+esac
